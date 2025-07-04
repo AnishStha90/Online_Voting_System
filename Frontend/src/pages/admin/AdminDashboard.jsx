@@ -93,8 +93,7 @@ export default function Dashboard() {
         setStats({
           totalAdmins,
           totalUsers,
-          totalUsersVoted,
-          totalUsersRemaining,
+          
           totalParties,
           totalOngoingElections,
           totalElectionsHeld,
@@ -119,8 +118,7 @@ export default function Dashboard() {
   const chartData = [
     { name: "Admins", value: stats.totalAdmins },
     { name: "Users", value: stats.totalUsers },
-    { name: "Users Voted", value: stats.totalUsersVoted },
-    { name: "Users Remaining", value: stats.totalUsersRemaining },
+   
     { name: "Parties", value: stats.totalParties },
     { name: "Ongoing Elections", value: stats.totalOngoingElections },
     { name: "Elections Held", value: stats.totalElectionsHeld },
@@ -145,14 +143,7 @@ export default function Dashboard() {
           <FaFlag style={iconStyle} />
           <strong>Total Parties:</strong> {stats.totalParties}
         </li>
-        <li>
-          <FaCheckCircle style={iconStyle} />
-          <strong>Total Users Voted:</strong> {stats.totalUsersVoted}
-        </li>
-        <li>
-          <FaHourglassHalf style={iconStyle} />
-          <strong>Total Users Remaining to Vote:</strong> {stats.totalUsersRemaining}
-        </li>
+       
         <li>
           <FaCalendarAlt style={iconStyle} />
           <strong>Ongoing Elections:</strong> {stats.totalOngoingElections}

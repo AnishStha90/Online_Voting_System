@@ -1,22 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import {
+  PhoneIcon,
+  EnvelopeIcon,
+  CakeIcon,
+  CheckBadgeIcon,
+  UserIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  CheckIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/solid';
+
 
 export default function PartyDetail() {
   const { partyId } = useParams();
   const navigate = useNavigate();
+  const [party, setParty] = useState(null);
   const [members, setMembers] = useState([]);
   const [error, setError] = useState(null);
   const token = localStorage.getItem('token');
   const [loading, setLoading] = useState(false);
 
-  // For editing:
   const [editingMemberId, setEditingMemberId] = useState(null);
   const [editFormData, setEditFormData] = useState({
     name: '',
     phone: '',
     email: '',
     dateOfBirth: '',
+    position: '',
+    gender: '',
   });
   const [editError, setEditError] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
@@ -28,29 +42,39 @@ export default function PartyDetail() {
       return;
     }
 
-    const fetchMembers = async () => {
+    const fetchPartyAndMembers = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
+        const partyRes = await axios.get(
+          `http://localhost:5000/api/parties/${partyId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setParty(partyRes.data);
+
+        const membersRes = await axios.get(
           `http://localhost:5000/api/partyMembers/byParty/${partyId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setMembers(res.data);
+        setMembers(membersRes.data);
         setError(null);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load members.');
-        setMembers([]); // Clear members on error
+        setError(
+          err.response?.data?.message || 'Failed to load party or members.'
+        );
+        setMembers([]);
+        setParty(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMembers();
+    fetchPartyAndMembers();
   }, [partyId, token]);
 
-  // Start editing a member: fill form with current data
   const handleEdit = (member) => {
     setEditingMemberId(member._id);
     setEditFormData({
@@ -58,6 +82,8 @@ export default function PartyDetail() {
       phone: member.phone || '',
       email: member.email || '',
       dateOfBirth: member.dateOfBirth ? member.dateOfBirth.split('T')[0] : '',
+      position: member.position || '',
+      gender: member.gender || '',
     });
     setEditError(null);
   };
@@ -87,7 +113,6 @@ export default function PartyDetail() {
         }
       );
 
-      // Update member list with updated data
       setMembers((prev) =>
         prev.map((m) => (m._id === editingMemberId ? res.data : m))
       );
@@ -100,7 +125,6 @@ export default function PartyDetail() {
     }
   };
 
-  // Delete handler
   const handleDelete = async (memberId) => {
     if (!window.confirm('Are you sure you want to delete this member?')) return;
 
@@ -111,7 +135,6 @@ export default function PartyDetail() {
       setMembers(members.filter((m) => m._id !== memberId));
       setError(null);
       if (editingMemberId === memberId) {
-        // If currently editing this member, close the form
         setEditingMemberId(null);
       }
     } catch (err) {
@@ -119,16 +142,58 @@ export default function PartyDetail() {
     }
   };
 
-  if (loading) return <div>Loading members...</div>;
+  if (loading) return <div>Loading party and members...</div>;
   if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
+  if (!party) return <div>No party data available.</div>;
 
   return (
     <div style={{ maxWidth: 1200, margin: '2rem auto', fontFamily: 'Arial' }}>
-            {/* Spacer div */}
-<div style={{ height: "3rem" }}></div>
-      <h2 style={{ textAlign: 'center' }}>Party Members</h2>
-      {/* Spacer div */}
-<div style={{ height: "3rem" }}></div>
+      {/* Party Info */}
+      <div
+        style={{
+          marginBottom: 30,
+          padding: 16,
+          backgroundColor: '#f9f9f9',
+          borderRadius: 8,
+          textAlign: 'center',
+        }}
+      >
+        <h2>{party.name}</h2>
+        {party.symbol && (
+          <div style={{ marginTop: 15 }}>
+            <img
+              src={`http://localhost:5000/${party.symbol}`}
+              alt={`${party.name} symbol`}
+              style={{
+                maxWidth: 150,
+                maxHeight: 150,
+                objectFit: 'contain',
+                border: '1px solid #ccc',
+                borderRadius: 8,
+                padding: 8,
+                backgroundColor: '#fff',
+              }}
+            />
+          </div>
+        )}
+        <p>
+          <strong>Description:</strong>{' '}
+          {party.description || 'No description provided.'}
+        </p>
+        <p>
+          <strong>Affiliated Political Party:</strong>{' '}
+          {party.affiliatedPoliticalParty || 'N/A'}
+        </p>
+        <p>
+          <strong>Established Year:</strong>{' '}
+          {party.establishedDate
+            ? new Date(party.establishedDate).getFullYear()
+            : 'N/A'}
+        </p>
+      </div>
+
+      {/* Members Section */}
+      <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Party Members</h2>
       {members.length === 0 ? (
         <p style={{ textAlign: 'center' }}>No members found for this party.</p>
       ) : (
@@ -141,7 +206,6 @@ export default function PartyDetail() {
         >
           {members.map((member) =>
             editingMemberId === member._id ? (
-              // EDIT FORM
               <form
                 key={member._id}
                 onSubmit={handleEditSubmit}
@@ -197,6 +261,31 @@ export default function PartyDetail() {
                     style={{ width: '100%', padding: 8, marginTop: 4 }}
                   />
                 </label>
+                <label>
+                  Position:
+                  <input
+                    type="text"
+                    name="position"
+                    value={editFormData.position}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: 8, marginTop: 4 }}
+                  />
+                </label>
+                <label>
+                  Gender:
+                  <select
+                    name="gender"
+                    value={editFormData.gender}
+                    onChange={handleEditChange}
+                    required
+                    style={{ width: '100%', padding: 8, marginTop: 4 }}
+                  >
+                    <option value="">-- Select Gender --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </label>
 
                 {editError && (
                   <p style={{ color: 'red', margin: 0 }}>{editError}</p>
@@ -206,38 +295,23 @@ export default function PartyDetail() {
                   <button
                     type="submit"
                     disabled={editLoading}
-                    style={{
-                      padding: '8px 16px',
-                      backgroundColor: '#007bff',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 4,
-                      cursor: 'pointer',
-                      flexGrow: 1,
-                    }}
+                    title="Save"
+                    style={iconButton}
                   >
-                    {editLoading ? 'Saving...' : 'Save'}
+                    <CheckIcon style={{ width: 24, height: 24, color: '#28a745' }} />
                   </button>
                   <button
                     type="button"
                     onClick={handleEditCancel}
                     disabled={editLoading}
-                    style={{
-                      padding: '8px 16px',
-                      backgroundColor: '#6c757d',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 4,
-                      cursor: 'pointer',
-                      flexGrow: 1,
-                    }}
+                    title="Cancel"
+                    style={iconButton}
                   >
-                    Cancel
+                    <XMarkIcon style={{ width: 24, height: 24, color: '#dc3545' }} />
                   </button>
                 </div>
               </form>
             ) : (
-              // MEMBER CARD
               <div
                 key={member._id}
                 style={{
@@ -245,8 +319,8 @@ export default function PartyDetail() {
                   border: '1px solid #ccc',
                   borderRadius: 8,
                   padding: 16,
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
                   backgroundColor: '#fff',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
                   alignItems: 'center',
                   gap: 12,
                 }}
@@ -274,40 +348,27 @@ export default function PartyDetail() {
                 )}
                 <div style={{ flexGrow: 1 }}>
                   <h3 style={{ margin: '0 0 0.25rem 0' }}>{member.name}</h3>
-                  <p style={{ margin: '0.25rem 0' }}>📞 {member.phone}</p>
-                  <p style={{ margin: '0.25rem 0' }}>✉️ {member.email}</p>
-                  <p style={{ margin: '0.25rem 0' }}>
-                    🎂 {new Date(member.dateOfBirth).toLocaleDateString()}
-                  </p>
+                  <p style={iconRow}><PhoneIcon style={iconStyle} />{member.phone}</p>
+                  <p style={iconRow}><EnvelopeIcon style={iconStyle} />{member.email}</p>
+                  <p style={iconRow}><CakeIcon style={iconStyle} />{new Date(member.dateOfBirth).toLocaleDateString()}</p>
+                  <p style={iconRow}><CheckBadgeIcon style={iconStyle} />Position: {member.position || 'N/A'}</p>
+                  <p style={iconRow}><UserIcon style={iconStyle} />{member.gender || 'N/A'}</p>
                 </div>
-                <div
-                  style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
-                >
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <button
                     onClick={() => handleEdit(member)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: '#007bff',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 4,
-                      cursor: 'pointer',
-                    }}
+                    title="Edit"
+                    style={iconButton}
                   >
-                    Edit
+                    <PencilSquareIcon style={{ width: 24, height: 24, color: '#007bff' }} />
                   </button>
                   <button
                     onClick={() => handleDelete(member._id)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: '#dc3545',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 4,
-                      cursor: 'pointer',
-                    }}
+                    title="Delete"
+                    style={iconButton}
                   >
-                    Delete
+                    <TrashIcon style={{ width: 24, height: 24, color: '#dc3545' }} />
                   </button>
                 </div>
               </div>
@@ -322,3 +383,17 @@ export default function PartyDetail() {
     </div>
   );
 }
+
+const iconStyle = { width: 16, height: 16, color: '#555' };
+const iconRow = {
+  margin: '0.25rem 0',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+};
+const iconButton = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  padding: 4,
+};

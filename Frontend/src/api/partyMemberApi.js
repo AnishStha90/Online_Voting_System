@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/partymembers';
+const API_URL = 'http://localhost:5000/api/partyMembers';
 
 // Get the Authorization header object (returns empty object if no token)
 const getAuthHeaders = () => {
@@ -27,7 +27,7 @@ export const getAllPartyMembers = async () => {
   });
 };
 
-// Get single member
+// Get single member by ID
 export const getPartyMemberById = async (id) => {
   return axios.get(`${API_URL}/${id}`, {
     headers: {
@@ -58,15 +58,17 @@ export const deletePartyMember = async (id) => {
 // Get members by partyId
 export const getMembersByParty = async (partyId) => {
   const token = localStorage.getItem('token');
-  const response = await axios.get(`${API_URL}/byparty/${partyId}`, {
+  const response = await axios.get(`${API_URL}/byParty/${partyId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
 
-export const getMembersByPartyId = async (partyId) => {
+// Filter members by position (position passed as query param)
+export const getPartyMembersByPosition = async (position) => {
+  if (!position) throw new Error('Position parameter is required');
   const token = localStorage.getItem('token');
-  const response = await axios.get(`${API_URL}/byParty/${partyId}`, {
+  const response = await axios.get(`${API_URL}/filter/by-position?position=${encodeURIComponent(position)}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;

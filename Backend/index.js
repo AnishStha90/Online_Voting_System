@@ -12,6 +12,8 @@ const electionRoute = require('./routes/election')
 const authRoute = require('./routes/auth')
 const userController = require('./controllers/userController');
 const partyMemberRoutes = require('./routes/partyMemberRoutes');
+const inquireRoutes = require("./routes/inquires");
+const feedbackRoutes = require('./routes/feedback');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -34,7 +36,8 @@ app.use('/api/parties', partyRoute);
 app.use('/api/elections', electionRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/partymembers', partyMemberRoutes);
-
+app.use('/api/inquires', inquireRoutes)
+app.use('/api/feedback', feedbackRoutes);
 
 app.listen(port, () => {
     console.log(`App started successfully at port ${port}`);

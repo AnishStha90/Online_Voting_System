@@ -11,6 +11,7 @@ export default function Header() {
     { id: "home", label: "Home", path: "/home" },
     { id: "party", label: "Party", path: "/party" },
     { id: "election", label: "Election", path: "/elections" },
+    {id: "contact_us", label: "Contact Us", path: "/contact_us"},
   ];
 
   const handleProfileClick = () => {

@@ -4,7 +4,11 @@ const Party = require('../models/Party');
 // ✅ Create a new party member
 exports.createPartyMember = async (req, res) => {
   try {
-    const { name, phone, email, dateOfBirth, party } = req.body;
+    const { name, phone, email, gender, dateOfBirth, party, position } = req.body;
+
+    if (!name || !phone || !email || !gender || !dateOfBirth || !party || !position) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
 
     if (!req.file) {
       return res.status(400).json({ error: 'Image is required' });
@@ -20,8 +24,10 @@ exports.createPartyMember = async (req, res) => {
       name,
       phone,
       email,
-      dateOfBirth,
+      gender,
+      dateOfBirth: new Date(dateOfBirth),
       party,
+      position,
       image: 'uploads/' + req.file.filename,
     });
 
@@ -114,6 +120,23 @@ exports.deletePartyMember = async (req, res) => {
     }
 
     res.json({ message: 'Party member deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ✅ Get members by position
+exports.getPartyMembersByPosition = async (req, res) => {
+  try {
+    const { position } = req.query;
+
+    if (!position) {
+      return res.status(400).json({ error: 'Position is required in query.' });
+    }
+
+    const members = await PartyMember.find({ position }).populate('party');
+
+    res.json(members);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

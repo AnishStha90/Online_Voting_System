@@ -2,13 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { createPartyMember } from '../../api/partyMemberApi';
 import { getAllParties } from '../../api/partyApi';
 
+const positions = ["President", "Vice President", "Secretary", "Treasurer", "Member"];
+const genders = ["Male", "Female", "Other"];
+
+function isValidPhone(phone) {
+  return /^\d{10}$/.test(phone); // Validates exactly 10 digits
+}
+
 const AdminPartyMemberForm = () => {
   const [form, setForm] = useState({
     name: '',
     phone: '',
     email: '',
+    gender: '',
     dateOfBirth: '',
     party: '',
+    position: '',
     image: null,
   });
 
@@ -18,7 +27,6 @@ const AdminPartyMemberForm = () => {
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(null);
 
-  // Fetch parties on mount
   useEffect(() => {
     const fetchParties = async () => {
       setLoadingParties(true);
@@ -36,22 +44,34 @@ const AdminPartyMemberForm = () => {
     fetchParties();
   }, []);
 
-  // Handle normal input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle file input change
   const handleFileChange = (e) => {
     setForm((prev) => ({ ...prev, image: e.target.files[0] || null }));
   };
 
-  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError(null);
     setSubmitSuccess(null);
+
+    if (!form.position) {
+      setSubmitError('Please select a position.');
+      return;
+    }
+
+    if (!form.gender) {
+      setSubmitError('Please select a gender.');
+      return;
+    }
+
+    if (!isValidPhone(form.phone)) {
+      setSubmitError('Invalid phone number. Must be exactly 10 digits.');
+      return;
+    }
 
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
@@ -63,17 +83,16 @@ const AdminPartyMemberForm = () => {
     try {
       await createPartyMember(formData);
       setSubmitSuccess('Party Member Created Successfully');
-
-      // Reset form
       setForm({
         name: '',
         phone: '',
         email: '',
+        gender: '',
         dateOfBirth: '',
         party: '',
+        position: '',
         image: null,
       });
-      // Reset file input manually
       document.getElementById('imageInput').value = '';
     } catch (err) {
       setSubmitError(err.response?.data?.error || 'Error occurred during creation.');
@@ -103,9 +122,14 @@ const AdminPartyMemberForm = () => {
       <input
         name="phone"
         type="text"
-        placeholder="Phone"
+        placeholder="Phone (10 digits)"
         value={form.phone}
-        onChange={handleChange}
+        onChange={(e) => {
+          const onlyDigits = e.target.value.replace(/\D/g, '');
+          if (onlyDigits.length <= 10) {
+            setForm((prev) => ({ ...prev, phone: onlyDigits }));
+          }
+        }}
         required
       />
       <input
@@ -116,6 +140,21 @@ const AdminPartyMemberForm = () => {
         onChange={handleChange}
         required
       />
+
+      <select
+        name="gender"
+        value={form.gender}
+        onChange={handleChange}
+        required
+      >
+        <option value="">-- Select Gender --</option>
+        {genders.map((g) => (
+          <option key={g} value={g}>
+            {g}
+          </option>
+        ))}
+      </select>
+
       <input
         name="dateOfBirth"
         type="date"
@@ -139,6 +178,20 @@ const AdminPartyMemberForm = () => {
               {party.name}
             </option>
           ))}
+      </select>
+
+      <select
+        name="position"
+        value={form.position}
+        onChange={handleChange}
+        required
+      >
+        <option value="">-- Select Position --</option>
+        {positions.map((pos) => (
+          <option key={pos} value={pos}>
+            {pos}
+          </option>
+        ))}
       </select>
 
       <input

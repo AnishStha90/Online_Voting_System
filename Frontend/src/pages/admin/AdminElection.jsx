@@ -3,10 +3,32 @@ import { getAllParties } from '../../api/partyApi';
 import { createElection } from '../../api/electionApi';
 import { getMembersByParty } from '../../api/partyMemberApi';
 
-const AdminElection = () => {
+const CustomButton = ({ children, onClick, title, style }) => (
+  <div
+    onClick={onClick}
+    role="button"
+    title={title}
+    style={{
+      backgroundColor: 'transparent',
+      userSelect: 'none',
+      cursor: 'pointer',
+      display: 'inline-flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '6px 12px',
+      borderRadius: 6,
+      fontWeight: '600',
+      transition: 'background-color 0.2s ease',
+      ...style,
+    }}
+  >
+    {children}
+  </div>
+);
+
+export default function AdminElection() {
   const [parties, setParties] = useState([]);
   const [membersByParty, setMembersByParty] = useState({});
-
   const [form, setForm] = useState({
     title: '',
     startDate: '',
@@ -47,7 +69,6 @@ const AdminElection = () => {
         }
       }
     }
-
     setForm({ ...form, posts: updatedPosts });
   };
 
@@ -85,21 +106,13 @@ const AdminElection = () => {
 
   const submitForm = async () => {
     try {
-      console.log('Submitting election:', form);
       await createElection(form);
       alert('Election created successfully');
-
-      // Reset form after success
       setForm({
         title: '',
         startDate: '',
         endDate: '',
-        posts: [
-          {
-            name: '',
-            candidates: [{ party: '', member: '' }],
-          },
-        ],
+        posts: [{ name: '', candidates: [{ party: '', member: '' }] }],
       });
       setMembersByParty({});
     } catch (error) {
@@ -109,60 +122,138 @@ const AdminElection = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8 bg-white rounded-2xl shadow-lg">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Create Election</h2>
+    <div
+      style={{
+        maxWidth: 900,
+        margin: '20px auto',
+        padding: 24,
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        fontFamily: 'Arial, sans-serif',
+      }}
+    >
+      <h2 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 20, color: '#333' }}>
+        Create Election
+      </h2>
 
       <input
         placeholder="Election Title"
         value={form.title}
         onChange={(e) => setForm({ ...form, title: e.target.value })}
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        style={{
+          width: '100%',
+          padding: 12,
+          fontSize: 16,
+          borderRadius: 8,
+          border: '1px solid #ccc',
+          marginBottom: 20,
+          color: '#333',
+          outline: 'none',
+        }}
       />
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
         <input
           type="date"
           value={form.startDate}
           onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-          className="w-full md:w-1/2 border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{
+            flex: '1 1 45%',
+            padding: 10,
+            fontSize: 16,
+            borderRadius: 8,
+            border: '1px solid #ccc',
+            color: '#333',
+            outline: 'none',
+          }}
         />
         <input
           type="date"
           value={form.endDate}
           onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-          className="w-full md:w-1/2 border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{
+            flex: '1 1 45%',
+            padding: 10,
+            fontSize: 16,
+            borderRadius: 8,
+            border: '1px solid #ccc',
+            color: '#333',
+            outline: 'none',
+          }}
         />
       </div>
 
       {form.posts.map((post, postIndex) => (
         <div
           key={postIndex}
-          className="bg-gray-100 border border-gray-200 rounded-xl p-5 mb-6 shadow-sm relative"
+          style={{
+            position: 'relative',
+            backgroundColor: '#f9f9f9',
+            border: '1px solid #ddd',
+            borderRadius: 12,
+            padding: 20,
+            marginBottom: 24,
+          }}
         >
-          <button
+          {/* Remove Post Button */}
+          <CustomButton
             onClick={() => removePost(postIndex)}
-            className="absolute top-2 right-3 text-red-600 font-bold text-xl hover:text-red-800"
             title="Remove Post"
-            type="button"
+            style={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              fontSize: 24,
+              color: '#d9534f',
+              fontWeight: 'bold',
+              userSelect: 'none',
+            }}
           >
             &times;
-          </button>
+          </CustomButton>
 
           <input
             placeholder="Post Name"
             value={post.name}
             onChange={(e) => handlePostChange(postIndex, 'name', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            style={{
+              width: '100%',
+              padding: 12,
+              fontSize: 16,
+              borderRadius: 8,
+              border: '1px solid #ccc',
+              marginBottom: 20,
+              color: '#333',
+              outline: 'none',
+            }}
           />
 
           {post.candidates.map((candidate, candidateIndex) => (
-            <div key={candidateIndex} className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+            <div
+              key={candidateIndex}
+              style={{
+                display: 'flex',
+                gap: 12,
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                marginBottom: 16,
+              }}
+            >
+              {/* Party Dropdown */}
               <select
                 value={candidate.party}
                 onChange={(e) =>
                   handleCandidateChange(postIndex, candidateIndex, 'party', e.target.value)
                 }
-                className="w-full sm:w-1/3 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                style={{
+                  flex: '1 1 40%',
+                  padding: 10,
+                  fontSize: 16,
+                  borderRadius: 8,
+                  border: '1px solid #ccc',
+                  color: '#333',
+                }}
               >
                 <option value="">Select Party</option>
                 {parties.map((party) => (
@@ -172,27 +263,33 @@ const AdminElection = () => {
                 ))}
               </select>
 
+              {/* Member Dropdown */}
               <select
                 value={candidate.member}
                 onChange={(e) =>
                   handleCandidateChange(postIndex, candidateIndex, 'member', e.target.value)
                 }
                 disabled={!candidate.party}
-                className={`w-full sm:w-1/3 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
-                  candidate.party
-                    ? 'border-gray-300 focus:ring-blue-400'
-                    : 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                }`}
+                style={{
+                  flex: '1 1 40%',
+                  padding: 10,
+                  fontSize: 16,
+                  borderRadius: 8,
+                  border: candidate.party ? '1px solid #ccc' : '1px solid #eee',
+                  backgroundColor: candidate.party ? '#fff' : '#eee',
+                  color: candidate.party ? '#333' : '#999',
+                  cursor: candidate.party ? 'pointer' : 'not-allowed',
+                }}
               >
                 <option value="">Select Member</option>
                 {candidate.party &&
                   membersByParty[candidate.party]
                     ?.filter((member) => {
+                      // Prevent duplicate members in other candidates
                       return (
                         !form.posts.some((p, pIdx) =>
                           p.candidates.some((c, cIdx) =>
-                            (pIdx !== postIndex || cIdx !== candidateIndex) &&
-                            c.member === member._id
+                            (pIdx !== postIndex || cIdx !== candidateIndex) && c.member === member._id
                           )
                         ) || member._id === candidate.member
                       );
@@ -204,45 +301,77 @@ const AdminElection = () => {
                     ))}
               </select>
 
-              <button
+              {/* Remove Candidate Button */}
+              <CustomButton
                 onClick={() => removeCandidate(postIndex, candidateIndex)}
-                className="text-red-600 hover:text-red-800 font-bold text-xl focus:outline-none"
                 title="Remove Candidate"
-                type="button"
+                style={{
+                  fontSize: 24,
+                  color: '#d9534f',
+                  fontWeight: 'bold',
+                  userSelect: 'none',
+                  marginLeft: 'auto',
+                }}
               >
                 &times;
-              </button>
+              </CustomButton>
             </div>
           ))}
 
           <button
-            onClick={() => addCandidate(postIndex)}
-            className="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-shadow shadow-sm"
             type="button"
+            onClick={() => addCandidate(postIndex)}
+            style={{
+              marginTop: 8,
+              padding: '8px 16px',
+              backgroundColor: '#007bff',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}
           >
             + Add Candidate
           </button>
         </div>
       ))}
 
-      <div className="flex flex-wrap gap-4">
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <button
-          onClick={addPost}
-          className="bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg px-5 py-2 transition-shadow shadow-sm"
           type="button"
+          onClick={addPost}
+          style={{
+            flex: '1 1 auto',
+            padding: '10px 20px',
+            backgroundColor: '#28a745',
+            border: 'none',
+            borderRadius: 8,
+            color: '#fff',
+            fontWeight: '600',
+            cursor: 'pointer',
+          }}
         >
           + Add Post
         </button>
+
         <button
-          onClick={submitForm}
-          className="bg-black hover:bg-gray-900 text-white font-medium rounded-lg px-5 py-2 transition-shadow shadow-sm"
           type="button"
+          onClick={submitForm}
+          style={{
+            flex: '1 1 auto',
+            padding: '10px 20px',
+            backgroundColor: '#000',
+            border: 'none',
+            borderRadius: 8,
+            color: '#fff',
+            fontWeight: '600',
+            cursor: 'pointer',
+          }}
         >
           Submit
         </button>
       </div>
     </div>
   );
-};
-
-export default AdminElection;
+}

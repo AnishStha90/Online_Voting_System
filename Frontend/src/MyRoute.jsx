@@ -19,13 +19,16 @@ import AdminElection from './pages/admin/AdminElection';
 import AdminParty from './pages/admin/AdminParty';
 import AdminVoters from './pages/admin/AdminVoters';
 import AdminProfile from './pages/admin/AdminProfile';
-
 import ElectionsList from './pages/ElectionList';
 import AdminPartyMemberForm from './pages/admin/AdminPartyMemberForm';
 import PartyMembers from './pages/PartyMembers';
 import PartyDetail from './pages/admin/PartyDetail';
 import LiveResults from './pages/LiveResults';
 import LandingPage from './pages/LandingPage';
+import Contact_Us from './pages/Contact_Us';
+import AdminInquiriesList from './pages/admin/AdminInquiriesList';
+import AdminFeedback from './pages/admin/AdminFeedback';
+import UserFeedback from './pages/UserFeedback';
 
 const MyRoute = () => {
   return (
@@ -50,6 +53,8 @@ const MyRoute = () => {
             <Route path="elections" element={<ElectionsList />} />
             <Route path="elections/:id" element={<Election />} />
             <Route path="elections/:id/results" element={<LiveResults />} />
+            <Route path="contact_us" element={<Contact_Us/>}/>
+            <Route path="feedback" element={<UserFeedback/>}/>
           </Route>
 
           {/* Admin routes (Admin Protected) */}
@@ -65,6 +70,8 @@ const MyRoute = () => {
             <Route path="voters" element={<AdminVoters />} />
             <Route path="profile" element={<AdminProfile />} />
             <Route path="partymembers/new" element={<AdminPartyMemberForm />} />
+            <Route path="inquires" element={<AdminInquiriesList/>}/>
+            <Route path="feedback/:id" element={<AdminFeedback/>} />
           </Route>
         </Routes>
       </BrowserRouter>

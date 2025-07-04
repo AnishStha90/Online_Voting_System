@@ -8,7 +8,8 @@ import {
   FlagIcon,
   UsersIcon,
   ArrowRightOnRectangleIcon,
-  UserPlusIcon, // ✅ Added
+  UserPlusIcon, 
+  EnvelopeIcon,// ✅ Added
 } from "@heroicons/react/24/solid";
 import { NavLink, useNavigate } from "react-router-dom";
 import '../../Sidebar.css';  // Custom CSS for sidebar
@@ -88,6 +89,17 @@ export default function AdminSidebar() {
           <UserPlusIcon className="icon" />
           Add Party Member
         </NavLink>
+        {/*inquiressection*/}
+        <NavLink
+        to="/admin/inquires"
+        className={({ isActive }) =>
+            isActive ? "active" : ""
+          }
+        >
+            <EnvelopeIcon className="icon" />
+            Inquiries
+        </NavLink>
+
 
         {/* 🔴 Logout Button */}
         <button

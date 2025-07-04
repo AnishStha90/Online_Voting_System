@@ -29,6 +29,17 @@ export default function Profile() {
   if (loading) return <p className="loading-text">Loading profile...</p>;
   if (!user) return <p className="error-text">Unable to load profile.</p>;
 
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   return (
     <div className="container">
       <div className="left-panel">
@@ -41,15 +52,20 @@ export default function Profile() {
             />
           )}
           <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Age:</strong> {new Date().getFullYear() - new Date(user.dateOfBirth).getFullYear()}</p>
+          <p><strong>Age:</strong> {calculateAge(user.dateOfBirth)}</p>
+          <p><strong>Gender:</strong> {user.gender}</p>
           <p><strong>Phone:</strong> {user.phone}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>District:</strong> {user.district}</p>
-          <p><strong>Gender:</strong>{user.gender}</p>
-          <p><strong>VoterID:</strong>{user.voterid}</p>
-          <p><strong>Status:</strong> <span className="voted-status">Voted</span></p>
+          <p><strong>Student ID:</strong> {user.studentid}</p>
+          <p><strong>Verification:</strong> 
+            <span className={user.isVerified ? "verified" : "not-verified"}>
+              {user.isVerified ? "Verified" : "Not Verified"}
+            </span>
+          </p>
         </div>
       </div>
+
       <div className="right-panel">
         <h1>Welcome <span className="highlight">{user.name.split(" ")[0]}</span></h1>
         <h2>Welcome to Online Voting Platform</h2>
@@ -59,8 +75,6 @@ export default function Profile() {
           of modern technology, we bring democracy to your fingertips, enabling you to participate
           in important decisions and elections from the comfort of your own home. Our secure and
           user-friendly platform ensures that your vote is counted accurately and confidentially.
-          Whether it's electing your local representatives, deciding on community initiatives, or
-          participating in organizational polls, our platform empowers you to make a difference.
         </p>
       </div>
     </div>

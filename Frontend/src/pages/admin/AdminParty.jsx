@@ -6,10 +6,17 @@ import {
   updateParty,
   deleteParty,
 } from '../../api/partyApi';
+import { PencilSquareIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/solid';
 
 const AdminParty = () => {
   const [parties, setParties] = useState([]);
-  const [form, setForm] = useState({ name: '', description: '', symbolFile: null });
+  const [form, setForm] = useState({
+    name: '',
+    description: '',
+    affiliatedPoliticalParty: '',
+    establishedYear: '',
+    symbolFile: null,
+  });
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -37,7 +44,17 @@ const AdminParty = () => {
       const formData = new FormData();
       formData.append('name', form.name);
       formData.append('description', form.description);
-      // Append symbolFile only if new file selected
+      formData.append('affiliatedPoliticalParty', form.affiliatedPoliticalParty);
+
+      if (form.establishedYear) {
+        const yearNum = parseInt(form.establishedYear, 10);
+        if (isNaN(yearNum) || yearNum < 1800 || yearNum > 3000) {
+          setError('Established year must be a valid year between 1800 and 3000.');
+          return;
+        }
+        formData.append('establishedDate', `${yearNum}-01-01`);
+      }
+
       if (form.symbolFile) {
         formData.append('symbol', form.symbolFile);
       }
@@ -49,7 +66,13 @@ const AdminParty = () => {
         await createParty(formData, token);
       }
 
-      setForm({ name: '', description: '', symbolFile: null });
+      setForm({
+        name: '',
+        description: '',
+        affiliatedPoliticalParty: '',
+        establishedYear: '',
+        symbolFile: null,
+      });
       fetchParties();
     } catch (err) {
       setError(err.message || 'Something went wrong');
@@ -57,7 +80,15 @@ const AdminParty = () => {
   };
 
   const handleEdit = (party) => {
-    setForm({ name: party.name, description: party.description, symbolFile: null });
+    setForm({
+      name: party.name || '',
+      description: party.description || '',
+      affiliatedPoliticalParty: party.affiliatedPoliticalParty || '',
+      establishedYear: party.establishedDate
+        ? new Date(party.establishedDate).getFullYear().toString()
+        : '',
+      symbolFile: null,
+    });
     setEditId(party._id);
   };
 
@@ -96,21 +127,37 @@ const AdminParty = () => {
               style={{ objectFit: 'contain', marginBottom: 10 }}
             />
             <p>{party.description}</p>
+            <p>
+              <strong>Affiliated Political Party:</strong>{' '}
+              {party.affiliatedPoliticalParty || 'N/A'}
+            </p>
+            <p>
+              <strong>Established Year:</strong>{' '}
+              {party.establishedDate
+                ? new Date(party.establishedDate).getFullYear()
+                : 'N/A'}
+            </p>
             <div style={styles.buttonGroup}>
               <button
                 onClick={() => handleDetail(party._id)}
-                style={styles.detailBtn}
+                style={styles.iconBtn}
+                title="View Details"
               >
-                Detail
+                <EyeIcon style={styles.icon} />
               </button>
-              <button onClick={() => handleEdit(party)} style={styles.editBtn}>
-                Edit
+              <button
+                onClick={() => handleEdit(party)}
+                style={styles.iconBtn}
+                title="Edit Party"
+              >
+                <PencilSquareIcon style={styles.icon} />
               </button>
               <button
                 onClick={() => handleDelete(party._id)}
-                style={styles.deleteBtn}
+                style={styles.iconBtn}
+                title="Delete Party"
               >
-                Delete
+                <TrashIcon style={{ ...styles.icon, color: '#dc3545' }} />
               </button>
             </div>
           </div>
@@ -119,58 +166,82 @@ const AdminParty = () => {
 
       <div style={styles.formContainer}>
         <h3>{editId ? 'Edit Party' : 'Add Party'}</h3>
-        
 
-<form onSubmit={handleSubmit} style={styles.form}>
-  <input
-    type="text"
-    placeholder="Party Name"
-    value={form.name}
-    onChange={(e) => setForm({ ...form, name: e.target.value })}
-    required
-    style={styles.input}
-  />
-  <input
-    type="file"
-    accept="image/*"
-    onChange={handleFileChange}
-    {...(!editId && { required: true })}
-    style={styles.input}
-  />
-  <textarea
-    placeholder="Description"
-    value={form.description}
-    onChange={(e) => setForm({ ...form, description: e.target.value })}
-    style={{ ...styles.input, height: 80 }}
-  />
-  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-    <button type="submit" style={styles.submitBtn}>
-      {editId ? 'Update Party' : 'Create Party'}
-    </button>
-    {editId && (
-      <button
-        type="button"
-        onClick={() => {
-          setEditId(null);
-          setForm({ name: '', description: '', symbolFile: null });
-          setError(null);
-        }}
-        style={{
-          padding: '0.6rem',
-          fontSize: '1rem',
-          backgroundColor: '#6c757d',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-        }}
-      >
-        Cancel
-      </button>
-    )}
-  </div>
-</form>
-
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <input
+            type="text"
+            placeholder="Party Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+            style={styles.input}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            {...(!editId && { required: true })}
+            style={styles.input}
+          />
+          <textarea
+            placeholder="Description"
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            style={{ ...styles.input, height: 80 }}
+          />
+          <input
+            type="text"
+            placeholder="Affiliated Political Party"
+            value={form.affiliatedPoliticalParty}
+            onChange={(e) =>
+              setForm({ ...form, affiliatedPoliticalParty: e.target.value })
+            }
+            style={styles.input}
+          />
+          <input
+            type="number"
+            placeholder="Established Year (e.g. 1990)"
+            value={form.establishedYear}
+            onChange={(e) =>
+              setForm({ ...form, establishedYear: e.target.value })
+            }
+            style={styles.input}
+            min={1800}
+            max={3000}
+          />
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <button type="submit" style={styles.submitBtn}>
+              {editId ? 'Update Party' : 'Create Party'}
+            </button>
+            {editId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditId(null);
+                  setForm({
+                    name: '',
+                    description: '',
+                    affiliatedPoliticalParty: '',
+                    establishedYear: '',
+                    symbolFile: null,
+                  });
+                  setError(null);
+                }}
+                style={{
+                  padding: '0.6rem',
+                  fontSize: '1rem',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   );
@@ -211,31 +282,19 @@ const styles = {
   buttonGroup: {
     marginTop: '1rem',
     display: 'flex',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
+    gap: '0.5rem',
   },
-  detailBtn: {
-    backgroundColor: '#17a2b8',
-    color: '#fff',
+  iconBtn: {
+    background: 'none',
     border: 'none',
-    padding: '0.4rem 0.8rem',
-    borderRadius: '4px',
     cursor: 'pointer',
+    padding: '0.3rem',
   },
-  editBtn: {
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    padding: '0.4rem 0.8rem',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-  deleteBtn: {
-    backgroundColor: '#dc3545',
-    color: '#fff',
-    border: 'none',
-    padding: '0.4rem 0.8rem',
-    borderRadius: '4px',
-    cursor: 'pointer',
+  icon: {
+    width: '24px',
+    height: '24px',
+    color: '#333',
   },
   formContainer: {
     background: '#fff',

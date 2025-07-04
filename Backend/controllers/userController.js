@@ -27,9 +27,9 @@ function calculateAge(dateOfBirth) {
 // -------------------- REGISTER --------------------
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, phone, dateOfBirth, gender, voterid, district } = req.body;
+    const { name, email, password, phone, dateOfBirth, gender, studentid, district } = req.body;
 
-    if (!name || !email || !password || !phone || !dateOfBirth || !district || !gender || !voterid) {
+    if (!name || !email || !password || !phone || !dateOfBirth || !district || !gender || !studentid) {
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
@@ -66,7 +66,7 @@ exports.register = async (req, res) => {
       phone,
       dateOfBirth,
       gender,
-      voterid,
+      studentid,
       image: imagePath,
       district,
       role: 'voter',
@@ -188,7 +188,7 @@ exports.verifyLoginOTP = async (req, res) => {
         image: user.image,
         district: user.district,
         gender: user.gender,
-        voterid: user.voterid
+        student: user.studentid
       }
     });
   } catch (err) {

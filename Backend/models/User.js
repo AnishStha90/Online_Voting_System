@@ -35,8 +35,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  voterid:{
+  studentid:{
     type: Number,
+    unique: true,
     required: true
   },
   image: {

@@ -13,10 +13,16 @@ const partySchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  affiliatedPoliticalParty: {
+    type: String, // or mongoose.Schema.Types.ObjectId if it's a reference to another party
+  },
+  establishedDate: {
+    type: Date,
+  },
   members: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'PartyMember',  // <-- Correct reference here
+      ref: 'PartyMember',
     },
   ],
 }, { timestamps: true });

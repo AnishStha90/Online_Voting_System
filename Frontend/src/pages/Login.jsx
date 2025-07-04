@@ -9,7 +9,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState(""); // Track user role
+  const [role, setRole] = useState("");
 
   const navigate = useNavigate();
 
@@ -31,26 +31,24 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const res = await loginUser(email, password); // backend call
+      const res = await loginUser(email, password);
 
-      // Admin login returns token & user
       if (res.token && res.user) {
-        
-        // Save token and user info
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
-        console.log('Login token:', res.token); 
-         alert(`Welcome, ${res.user.username || res.user.name || res.user.email}!`);
+        localStorage.setItem("email", res.user.email); // ✅ Save email
+
+        alert(`Welcome, ${res.user.username || res.user.name || res.user.email}!`);
+
         if (res.user.role === "admin") {
           navigate("/admin/dashboard");
         } else {
-          // Just in case, if a voter gets token here (unlikely)
           setRole(res.user.role);
           setStep(2);
         }
       } else if (res.message && res.message.includes("OTP sent")) {
-        // Voter login response, OTP sent message
         setRole("voter");
+        localStorage.setItem("email", email); // ✅ Save email for OTP use
         setStep(2);
       } else {
         alert("Unexpected login response");
@@ -75,7 +73,10 @@ const Login = () => {
       if (data.token && data.user) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-         alert(`Welcome, ${data.user.username || data.user.name || data.user.email}!`);
+        localStorage.setItem("email", data.user.email); // ✅ Save email after OTP
+        console.log("Stored email:", localStorage.getItem("email"));
+
+        alert(`Welcome, ${data.user.username || data.user.name || data.user.email}!`);
         navigate("/home");
       } else {
         alert("Invalid OTP verification response");
@@ -88,9 +89,10 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div className="login-container">
       {step === 1 && (
-        <form onSubmit={handleLoginSubmit}>
+        <form onSubmit={handleLoginSubmit} className="login-form">
+          <h2>Login</h2>
           <input
             type="email"
             placeholder="Enter Email"
@@ -112,7 +114,7 @@ const Login = () => {
       )}
 
       {step === 2 && role === "voter" && (
-        <div>
+        <div className="otp-section">
           <p>Enter OTP sent to <b>{email}</b></p>
           <OtpInput length={6} onOtpSubmit={handleOtpSubmit} />
           {loading && <p>Verifying OTP...</p>}

@@ -53,4 +53,11 @@ router.delete(
   partyMemberController.deletePartyMember
 );
 
+// Get members by position (admin only or authenticated users depending on your logic)
+router.get(
+  '/filter/by-position',
+  isAuthenticated, // ✅ You can restrict this to admin if needed
+  partyMemberController.getPartyMembersByPosition
+);
+
 module.exports = router;

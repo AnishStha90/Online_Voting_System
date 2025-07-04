@@ -11,7 +11,12 @@ const partyMemberSchema = new mongoose.Schema(
     image: { type: String, required: true },
     phone: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
+    gender: {
+    type: String,
+    required: true
+  },
     dateOfBirth: { type: Date, required: true },
+    position: { type: String, required: true},
   },
   { timestamps: true }
 );
