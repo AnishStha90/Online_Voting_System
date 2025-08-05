@@ -1,0 +1,47 @@
+.elections-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .elections-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .elections-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.election-card {
+  border: 1px solid #ccc;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  background-color: white; /* ensure white bg */
+}
+
+.election-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.election-title {
+  color: #2563eb; /* blue-600 */
+  font-weight: 600;
+  font-size: 1.25rem;
+  text-decoration: none;
+}
+
+.election-title:hover {
+  text-decoration: underline;
+}
+
+.election-description {
+  color: #4b5563; /* gray-700 */
+  margin-top: 8px;
+  font-size: 1rem;
+}
