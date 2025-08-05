@@ -50,6 +50,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ error: 'User photo is required.' });
     }
 
+<<<<<<< HEAD
    const existingEmail = await User.findOne({ email });
 if (existingEmail) {
   return res.status(400).json({ error: 'Email is already registered.' });
@@ -60,6 +61,12 @@ if (existingStudentId) {
   return res.status(409).json({ error: 'This student ID is already in use, check your ID' });
 }
 
+=======
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists.' });
+    }
+>>>>>>> 85e5ef3cb1d1526f9277237b44e4d31e70cbc94b
 
     const hashedPassword = await bcrypt.hash(password, 10);
    

@@ -257,6 +257,10 @@ const Election = () => {
 
 
 
+=======
+      <button onClick={() => navigate(-1)} style={{ marginTop: '1rem' }}>
+        ← Back
+      </button>
       <div style={{ height: "3rem" }}></div>
     </div>
   );

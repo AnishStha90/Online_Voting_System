@@ -128,7 +128,11 @@ export default function Dashboard() {
     <div
       style={{ maxWidth: 800, margin: "auto", fontFamily: "Arial, sans-serif" }}
     >
+<<<<<<< HEAD
       <h1>Dashboard</h1>
+=======
+      <h1>Voting System Dashboard</h1>
+>>>>>>> 85e5ef3cb1d1526f9277237b44e4d31e70cbc94b
 
       <ul style={{ listStyle: "none", padding: 0 }}>
         <li>

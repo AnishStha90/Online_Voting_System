@@ -325,6 +325,7 @@ export default function PartyDetail() {
         </div>
       )}
 
+<<<<<<< HEAD
       <button
   onClick={() => navigate(-1)}
   style={{
@@ -340,6 +341,11 @@ export default function PartyDetail() {
   ← Back
 </button>
 
+=======
+      <button onClick={() => navigate(-1)} style={{ marginTop: 20 }}>
+        ← Back
+      </button>
+>>>>>>> 85e5ef3cb1d1526f9277237b44e4d31e70cbc94b
     </div>
   );
 }

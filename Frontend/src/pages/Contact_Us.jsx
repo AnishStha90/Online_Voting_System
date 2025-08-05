@@ -86,6 +86,7 @@ const ContactUs = () => {
 
         {/* Feedback navigation button */}
         <div className="flex justify-end mt-4">
+<<<<<<< HEAD
          <button
   onClick={handleViewFeedback}
   style={{
@@ -104,6 +105,15 @@ const ContactUs = () => {
 
         </div>
          <div style={{ height: "3rem" }}></div>
+=======
+          <button
+            onClick={handleViewFeedback}
+            className="text-blue-600 font-semibold hover:underline"
+          >
+            View All Feedback
+          </button>
+        </div>
+>>>>>>> 85e5ef3cb1d1526f9277237b44e4d31e70cbc94b
       </div>
     </div>
   );

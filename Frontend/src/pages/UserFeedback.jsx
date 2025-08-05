@@ -77,6 +77,7 @@ const UserFeedback = () => {
           </p>
         </div>
       ))}
+<<<<<<< HEAD
       <button
   onClick={() => navigate(-1)}
   style={{
@@ -93,6 +94,11 @@ const UserFeedback = () => {
   ← Back
 </button>
 
+=======
+      <button onClick={() => navigate(-1)} style={{ marginTop: 20 }}>
+        ← Back
+      </button>
+>>>>>>> 85e5ef3cb1d1526f9277237b44e4d31e70cbc94b
     </div>
   );
 };
